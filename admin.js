@@ -1,4 +1,4 @@
-const API="http://127.0.0.1:8000";
+const API="https://resume-agent-4ifb.onrender.com";
 
 const login=document.getElementById("login");
 const panel=document.getElementById("panel");
