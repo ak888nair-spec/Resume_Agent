@@ -5,52 +5,54 @@ const panel=document.getElementById("panel");
 const message=document.getElementById("message");
 const status=document.getElementById("status");
 
-async function refresh(){
+async function refresh() {
+    try {
+        const response = await fetch(API + "/admin/recruit/status");
 
-    const response=await fetch(API+"/admin/recruit/status");
+        if (!response.ok) {
+            throw new Error("Failed to fetch status");
+        }
 
-    const data=await response.json();
+        const data = await response.json();
 
-    status.innerHTML=data.recruitment
-    ?"🟢 Recruitment Open"
-    :"🔴 Recruitment Closed";
+        status.innerHTML = data.recruitment
+            ? "🟢 Recruitment Open"
+            : "🔴 Recruitment Closed";
 
+    } catch (err) {
+        console.error(err);
+        message.innerHTML = "Unable to fetch recruitment status.";
+    }
 }
 
-login.onclick=async()=>{
+login.onclick = async () => {
+    try {
+        const password = document.getElementById("password").value;
 
-    const password=document.getElementById("password").value;
+        const response = await fetch(API + "/admin/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                password: password
+            })
+        });
 
-    const response=await fetch(API+"/admin/login",{
+        if (!response.ok) {
+            message.innerHTML = "Incorrect Password";
+            return;
+        }
 
-        method:"POST",
+        panel.style.display = "block";
+        message.innerHTML = "";
 
-        headers:{
-            "Content-Type":"application/json"
-        },
+        await refresh();
 
-        body:JSON.stringify({
-            password:password
-        })
-
-    });
-
-    if(response.ok){
-
-        panel.style.display="block";
-
-        message.innerHTML="";
-
-        refresh();
-
+    } catch (err) {
+        console.error(err);
+        message.innerHTML = "Server connection failed.";
     }
-
-    else{
-
-        message.innerHTML="Incorrect Password";
-
-    }
-
 };
 
 document.getElementById("open").onclick=async()=>{
